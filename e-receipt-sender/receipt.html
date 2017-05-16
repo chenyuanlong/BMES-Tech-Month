@@ -1,0 +1,62 @@
+<? 
+  var sheetId = "";
+  var book = SpreadsheetApp.openById(sheetId);
+  var sheet = book.getActiveSheet();
+  
+  function getRegMembers(sheet) {
+    var memName = sheet.getRange(2, 2, sheet.getLastRow() - 1).getValues();
+    return memName;
+  } 
+?>
+<!DOCTYPE html>
+<html>
+
+<head>
+  <base target="_top">
+  <style type="text/css">
+    body,
+    select,
+    input {
+      font-size: 25px;
+    }
+  </style>
+  <script>
+    function onSubSuccess(result) {
+      var div = document.getElementById('output');
+      if (myForm.select.value != "error" && !result) {
+        div.innerHTML = 'E-receipt sent successfully.';
+      } else if (myForm.select.value != "error" && result) {
+        div.innerHTML = 'E-receipt already sent. Not sending again.'
+      }
+    }
+
+    function onChange(result) {
+      if (myForm.select.value != "error") {
+        var div = document.getElementById('output');
+        div.innerHTML = "";
+        div.innerHTML += "Workshop Selection:<br>";
+        div.innerHTML += result;
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <div align="center">
+    <form name="myForm">
+      <select name="select" onchange="google.script.run.withSuccessHandler(onChange).returnMemData(this.value)">
+        <option value="error">Select Member</option>
+        <? for (var i in getRegMembers(sheet)) { ?>
+        <option value="<?= Number(i) + Number(2) ?>">
+          <?=getRegMembers(sheet)[i] ?>
+        </option>
+        <? } ?>
+      </select>
+      <br>
+      <input type="button" value="Send E-receipt" onClick="google.script.run.withSuccessHandler(onSubSuccess).processForm(this.form)" />
+      <div id="output"></div>
+    </form>
+  </div>
+</body>
+
+</html>
